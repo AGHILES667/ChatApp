@@ -14,8 +14,6 @@ const fs = require('fs');
 const htmlspecialchars = require('htmlspecialchars');
 const htmlspecialchars_decode = require('htmlspecialchars_decode');
 
-// prepare server
-// app.use('/api', api); // redirect API calls
 app.use('/custom', express.static(__dirname + '/node_modules/custom/')); // redirect root
 app.use('/jsjq', express.static(__dirname + '/node_modules/jquery/dist')); // redirect JS jQuery
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
@@ -43,7 +41,22 @@ const connection = mysql.createConnection({
   password: '',
   database: 'chat',
   multipleStatements: true
+  // port: 3000,
+  // protocol: 'TCP'
 });
+
+
+
+
+connection.connect((err) => {
+  if(err){
+    console.log(err.message);
+    
+    return
+  }
+  console.log("Connecté")
+});
+
 
 yangterhubung = []
 
@@ -159,7 +172,7 @@ app.post('/check_username', (req, res) => {
   connection.query(
     `SELECT username FROM cn_user WHERE username = '${htmlspecialchars(req.body.username)}'`,
     (error, results) => {
-      if (results.length >= 0) {
+      if (results.length > 0) {
         res.json(1);
       }else {
         res.json(0);
@@ -185,7 +198,7 @@ app.post('/signin', (req, res) => {
     'SELECT * FROM cn_user WHERE username = ? AND password = ?',
     [htmlspecialchars(req.body.username), htmlspecialchars(req.body.password)],
     (error, results) => {
-      if (results.length >= 0) {
+      if (results.length > 0) {
 
         req.session.loggedin = true;
         req.session.username = results[0].username;
